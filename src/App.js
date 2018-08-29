@@ -21,7 +21,7 @@ const fakeServerData = {
         ]
       },
       {
-        name: 'My Fav',
+        name: 'HipHop',
         songs: [
           { name: 'Beat it', duration: 70000 },
           { name: 'Le song', duration: 70000 },
@@ -32,7 +32,7 @@ const fakeServerData = {
         ]
       },
       {
-        name: 'My Fav',
+        name: 'RnB',
         songs: [
           { name: 'Beat it', duration: 70000 },
           { name: 'Le song', duration: 70000 },
@@ -43,7 +43,7 @@ const fakeServerData = {
         ]
       },
       {
-        name: 'My Fav',
+        name: 'Local',
         songs: [
           { name: 'Beat it', duration: 70000 },
           { name: 'Le song', duration: 70000 },
@@ -88,7 +88,10 @@ class Filter extends Component {
     return (
       <div style={defaultStyle}>
         <img />
-        <input type="text" />
+        <input
+          type="text"
+          onChange={e => this.props.onTextChange(e.target.value)}
+        />
       </div>
     );
   }
@@ -115,7 +118,8 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      serverData: {}
+      serverData: {},
+      filterString: ''
     };
   }
   componentDidMount() {
@@ -126,6 +130,13 @@ class App extends Component {
     }, 1000);
   }
   render() {
+    let playlistToRender = this.state.serverData.user
+      ? this.state.serverData.user.playlists.filter(playlist =>
+          playlist.name
+            .toLowerCase()
+            .includes(this.state.filterString.toLowerCase())
+        )
+      : [];
     return (
       <div className="App">
         {this.state.serverData.user ? (
@@ -134,20 +145,12 @@ class App extends Component {
               {this.state.serverData.user.name}
               's Playlist
             </h1>
-            <PlaylistCounter
-              playlists={
-                this.state.serverData.user &&
-                this.state.serverData.user.playlists
-              }
+            <PlaylistCounter playlists={playlistToRender} />
+            <HoursCounter playlists={playlistToRender} />
+            <Filter
+              onTextChange={text => this.setState({ filterString: text })}
             />
-            <HoursCounter
-              playlists={
-                this.state.serverData.user &&
-                this.state.serverData.user.playlists
-              }
-            />
-            <Filter />
-            {this.state.serverData.user.playlists.map(playlist => (
+            {playlistToRender.map(playlist => (
               <Playlist playlist={playlist} />
             ))}
           </div>
